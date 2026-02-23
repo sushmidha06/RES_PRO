@@ -1,0 +1,17 @@
+__pycache__/
+.streamlit/
+*.log
+*.txt
+!requirements.txt
+setup_aws.py
+*.csv
+*.pdf
+*.docx
+processed_talents_parquet/
+dataset/
+a.mp4
+.env
+.DS_Store
+# Keep models as they are needed for app.py
+!model/*.pkl
+model/metrics.json
