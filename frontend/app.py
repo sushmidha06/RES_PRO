@@ -48,23 +48,14 @@ st.set_page_config(
 # VIDEO BACKGROUND — robust HTML injection approach
 # ==================================================================
 def set_video_bg():
-    import base64
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    video_file = os.path.join(script_dir, "a.mp4")
+    # Using a fast external URL to prevent server slowdown
+    video_url = "https://cdn.pixabay.com/video/2023/10/20/185808-876798226_large.mp4"
     
-    video_html = ""
-    if os.path.exists(video_file):
-        with open(video_file, "rb") as f:
-            video_bytes = f.read()
-        b64 = base64.b64encode(video_bytes).decode()
-        video_html = f"""
-        <video autoplay loop muted playsinline id="bg-video"
-            style="position:fixed; top:0; left:0; min-width:100%; min-height:100%; 
-                   width:auto; height:auto; z-index:-1; object-fit:cover;
-                   filter:brightness(0.4) contrast(1.1);">
-            <source src="data:video/mp4;base64,{b64}" type="video/mp4">
+    video_html = f"""
+        <video autoplay muted loop id="bg-video">
+            <source src="{video_url}" type="video/mp4">
         </video>
-        """
+    """
     return video_html
 
 video_html = set_video_bg()
