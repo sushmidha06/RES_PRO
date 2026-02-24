@@ -43,7 +43,7 @@ sudo apt install python3-pip python3-venv git nginx -y
      ```
    - Paste your API key:
      ```text
-     GEMINI_API_KEY=AIzaSyCFeklshwxH7ZtvUYuHiqMFBM0o2PLPEf8
+     GEMINI_API_KEY=YOUR_SECURE_API_KEY_HERE
      ```
 
 ## Phase 4: Running the App (Production Style)
