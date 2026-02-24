@@ -12,7 +12,7 @@ This guide will walk you through the process of hosting your NexGen AI Agent Sys
    - Add **Inbound Rule**: Type: `SSH`, Port: `22`, Source: `Your IP`.
    - Optional: Add **Inbound Rule**: Type: `HTTP`, Port: `80`, Source: `0.0.0.0/0` (If using Nginx).
 3. **IAM Role**:
-   - Attach an IAM role to the instance with `AmazonBedrockFullAccess` (or specific permissions) if you are using Bedrock.
+   - Attach an IAM role to the instance with permissions if needed for S3.
 
 ## Phase 2: Server Configuration
 Connect to your instance: `ssh -i your-key.pem ubuntu@your-ec2-ip`
@@ -27,7 +27,7 @@ sudo apt install python3-pip python3-venv git nginx -y
 1. **Clone the Repository**:
    ```bash
    git clone <your-repo-url>
-   cd <your-repo-name>
+   cd resume_matching
    ```
 2. **Setup Virtual Environment**:
    ```bash
@@ -37,8 +37,14 @@ sudo apt install python3-pip python3-venv git nginx -y
    pip install -r requirements.txt
    ```
 3. **Environment Variables**:
-   - Set your `GOOGLE_API_KEY` (Gemini) in your environment or a `.env` file.
-   - For AWS Bedrock, ensure the EC2 IAM Role is correctly attached.
+   - Create a `.env` file in the root directory:
+     ```bash
+     nano .env
+     ```
+   - Paste your API key:
+     ```text
+     GEMINI_API_KEY=AIzaSyCFeklshwxH7ZtvUYuHiqMFBM0o2PLPEf8
+     ```
 
 ## Phase 4: Running the App (Production Style)
 We will use `systemd` to keep the app running in the background and restart it on failure.
@@ -47,7 +53,7 @@ We will use `systemd` to keep the app running in the background and restart it o
    ```bash
    sudo nano /etc/systemd/system/streamlit_app.service
    ```
-2. **Paste the following** (adjust paths):
+2. **Paste the following**:
    ```ini
    [Unit]
    Description=Streamlit App
@@ -55,8 +61,8 @@ We will use `systemd` to keep the app running in the background and restart it o
 
    [Service]
    User=ubuntu
-   WorkingDirectory=/home/ubuntu/your-repo-name
-   ExecStart=/home/ubuntu/your-repo-name/venv/bin/streamlit run app.py --server.port 8501
+   WorkingDirectory=/home/ubuntu/resume_matching
+   ExecStart=/home/ubuntu/resume_matching/venv/bin/streamlit run frontend/app.py --server.port 8501
    Restart=always
 
    [Install]
@@ -69,8 +75,8 @@ We will use `systemd` to keep the app running in the background and restart it o
    sudo systemctl enable streamlit_app
    ```
 
-## Phase 5 (Optional): Nginx Port Forwarding (Port 8501 -> Port 80)
-If you want to access the site via `http://your-ip` instead of `http://your-ip:8501`:
+## Phase 5: Nginx Port Forwarding (Port 8501 -> Port 80)
+To access the site via `http://your-ip` instead of `http://your-ip:8501`:
 1. Edit Nginx config: `sudo nano /etc/nginx/sites-available/default`
 2. Update the `location /` block:
    ```nginx

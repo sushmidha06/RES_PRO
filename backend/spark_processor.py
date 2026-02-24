@@ -41,7 +41,8 @@ def run_spark_skill_extraction():
         .getOrCreate()
 
     # Load dataset
-    csv_path = "dataset/resume_dataset.csv"
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    csv_path = os.path.join(BASE_DIR, 'ml', 'dataset', 'resume_dataset.csv')
     if not os.path.exists(csv_path):
         print(f"Error: {csv_path} not found.")
         return
@@ -80,9 +81,7 @@ def run_spark_skill_extraction():
     cloud_data_talents.select(target_pos_col, "skills").show(5, truncate=False)
     
     # Save processed data
-    # Note: Spark's native .write.parquet() requires winutils.exe and HADOOP_HOME on Windows.
-    # For local execution without Hadoop installed, we'll use Pandas as a fallback.
-    output_path = "processed_talents.csv"
+    output_path = os.path.join(BASE_DIR, 'ml', 'processed_talents.csv')
     try:
         print(f"Exporting {cloud_data_talents.count()} records to {output_path}...")
         cloud_data_talents.toPandas().to_csv(output_path, index=False)

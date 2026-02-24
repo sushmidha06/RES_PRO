@@ -1,4 +1,8 @@
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def find_working_model(api_key):
     genai.configure(api_key=api_key)
@@ -16,6 +20,6 @@ def find_working_model(api_key):
     return None
 
 if __name__ == "__main__":
-    key = "AIzaSyDntYbI6uGq81o_jW5o0MLCE6PYBmbo9Bo"
+    key = os.getenv("GEMINI_API_KEY")
     working_model = find_working_model(key)
     print(f"FINAL_WORKING_MODEL: {working_model}")

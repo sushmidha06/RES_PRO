@@ -8,3 +8,4 @@ langchain-google-genai
 langchain-core
 boto3
 scikit-learn
+python-dotenv

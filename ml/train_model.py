@@ -12,15 +12,23 @@ from sklearn.svm import LinearSVC
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from dotenv import load_dotenv
+
+# Load variables from .env file
+load_dotenv()
 
 # ==================================================================
 # CONFIGURATION & API SETUP
 # ==================================================================
-GEMINI_API_KEY = "AIzaSyDntYbI6uGq81o_jW5o0MLCE6PYBmbo9Bo"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") 
 genai.configure(api_key=GEMINI_API_KEY)
 
 # 1. SETUP
-if not os.path.exists('model'): os.makedirs('model')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, 'model')
+DATASET_DIR = os.path.join(BASE_DIR, 'dataset')
+
+if not os.path.exists(MODEL_DIR): os.makedirs(MODEL_DIR)
 
 def clean_text(text):
     text = str(text).lower()
@@ -32,7 +40,7 @@ def clean_text(text):
 # 2. LOAD & CLEAN DATASET
 # ==================================================================
 print("--- Step 1 & 2: Loading & Cleaning Dataset ---")
-csv_path = os.path.join('dataset', 'resume_dataset.csv')
+csv_path = os.path.join(DATASET_DIR, 'resume_dataset.csv')
 
 try:
     df = pd.read_csv(csv_path, encoding='utf-8-sig', on_bad_lines='skip', engine='python')
@@ -131,12 +139,12 @@ metrics = {
     "f1": f"{f1:.4f}",
     "classification_report": report
 }
-with open('model/metrics.json', 'w') as f:
+with open(os.path.join(MODEL_DIR, 'metrics.json'), 'w') as f:
     json.dump(metrics, f, indent=4)
 
 # 4. SAVE
-joblib.dump(tfidf, 'model/tfidf_vectorizer.pkl')
-joblib.dump(model, 'model/role_model.pkl')
+joblib.dump(tfidf, os.path.join(MODEL_DIR, 'tfidf_vectorizer.pkl'))
+joblib.dump(model, os.path.join(MODEL_DIR, 'role_model.pkl'))
 
 # ==================================================================
 # PREDICTION LOGIC (GEMINI + ML FALLBACK)
@@ -145,7 +153,7 @@ joblib.dump(model, 'model/role_model.pkl')
 def get_gemini_prediction(text):
     """Option 1: Use Gemini AI for prediction."""
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         prompt = f"""
         Act as an expert HR and Career Consultant. Analyze the following resume text and provide:
         1. The most suitable Job Role.
@@ -181,8 +189,8 @@ def get_gemini_prediction(text):
 def get_ml_prediction(text):
     """Option 2: Fallback to trained ML model."""
     try:
-        v = joblib.load('model/tfidf_vectorizer.pkl')
-        m = joblib.load('model/role_model.pkl')
+        v = joblib.load(os.path.join(MODEL_DIR, 'tfidf_vectorizer.pkl'))
+        m = joblib.load(os.path.join(MODEL_DIR, 'role_model.pkl'))
         
         cleaned = clean_text(text)
         vec = v.transform([cleaned])
