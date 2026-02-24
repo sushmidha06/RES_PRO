@@ -9,7 +9,6 @@ setup_aws.py
 *.docx
 processed_talents_parquet/
 dataset/
-a.mp4
 .env
 .DS_Store
 # Keep models as they are needed for app.py
